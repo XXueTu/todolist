@@ -153,21 +153,13 @@
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div id="delete-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-exclamation-triangle"></i> 确认删除</h3>
-                <button class="modal-close" id="close-delete-modal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p id="delete-message">确定要删除这个待办事项吗？此操作无法撤销。</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="cancel-delete">取消</button>
-                <button type="button" class="btn btn-danger" id="confirm-delete">删除</button>
+    <!-- Delete Confirmation Popup -->
+    <div id="delete-popup" class="delete-popup" style="display: none;">
+        <div class="delete-popup-content">
+            <p id="delete-popup-message">确定删除？</p>
+            <div class="delete-popup-buttons">
+                <button type="button" class="btn-small btn-danger" id="confirm-delete-popup">删除</button>
+                <button type="button" class="btn-small btn-secondary" id="cancel-delete-popup">取消</button>
             </div>
         </div>
     </div>

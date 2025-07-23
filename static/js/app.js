@@ -141,47 +141,79 @@ class TodoApp {
         this.hideLoading();
     }
 
-    showDeleteConfirm(id) {
+    showDeleteConfirm(id, buttonElement) {
         // 获取要删除的todo标题
-        const todo = this.todos.find(t => t.id === id);
-        const message = todo ? `确定要删除"${todo.title}"吗？此操作无法撤销。` : '确定要删除这个待办事项吗？此操作无法撤销。';
+        const todo = this.todos.find(t => t.id == id);
+        const message = todo ? `删除"${todo.title}"？` : '确定删除？';
         
-        document.getElementById('delete-message').textContent = message;
-        document.getElementById('delete-modal').style.display = 'flex';
+        const popup = document.getElementById('delete-popup');
+        const messageEl = document.getElementById('delete-popup-message');
         
-        // 绑定确认删除事件
-        const confirmBtn = document.getElementById('confirm-delete');
-        const cancelBtn = document.getElementById('cancel-delete');
-        const closeBtn = document.getElementById('close-delete-modal');
+        if (!popup || !messageEl) {
+            console.error('Popup elements not found!');
+            return;
+        }
+        
+        messageEl.textContent = message;
+        
+        // 计算弹框位置 - 显示在按钮上方
+        const buttonRect = buttonElement.getBoundingClientRect();
+        const popupWidth = 180; // 与CSS中的min-width匹配
+        
+        popup.style.left = Math.max(10, buttonRect.left + buttonRect.width/2 - popupWidth/2) + 'px';
+        popup.style.top = (buttonRect.top - 10) + 'px'; // 按钮上方10px
+        popup.style.transform = 'translateY(-100%)'; // 完全在按钮上方
+        popup.style.display = 'block';
+        
+        // 绑定事件
+        const confirmBtn = document.getElementById('confirm-delete-popup');
+        const cancelBtn = document.getElementById('cancel-delete-popup');
+        
+        // 移除旧的事件监听器
+        if (confirmBtn._deleteHandler) {
+            confirmBtn.removeEventListener('click', confirmBtn._deleteHandler);
+        }
+        if (cancelBtn._cancelHandler) {
+            cancelBtn.removeEventListener('click', cancelBtn._cancelHandler);
+        }
         
         const handleConfirm = () => {
             this.performDelete(id);
             this.hideDeleteConfirm();
-            cleanup();
         };
         
         const handleCancel = () => {
             this.hideDeleteConfirm();
-            cleanup();
         };
         
-        const cleanup = () => {
-            confirmBtn.removeEventListener('click', handleConfirm);
-            cancelBtn.removeEventListener('click', handleCancel);
-            closeBtn.removeEventListener('click', handleCancel);
-        };
+        confirmBtn._deleteHandler = handleConfirm;
+        cancelBtn._cancelHandler = handleCancel;
         
         confirmBtn.addEventListener('click', handleConfirm);
         cancelBtn.addEventListener('click', handleCancel);
-        closeBtn.addEventListener('click', handleCancel);
+        
+        // 点击其他地方关闭弹框
+        const handleClickOutside = (e) => {
+            if (!popup.contains(e.target)) {
+                this.hideDeleteConfirm();
+                document.removeEventListener('click', handleClickOutside);
+            }
+        };
+        
+        setTimeout(() => {
+            document.addEventListener('click', handleClickOutside);
+        }, 100);
     }
     
     hideDeleteConfirm() {
-        document.getElementById('delete-modal').style.display = 'none';
+        const popup = document.getElementById('delete-popup');
+        if (popup) {
+            popup.style.display = 'none';
+        }
     }
 
-    async deleteTodo(id) {
-        this.showDeleteConfirm(id);
+    async deleteTodo(id, buttonElement) {
+        this.showDeleteConfirm(id, buttonElement);
     }
     
     async performDelete(id) {
@@ -349,7 +381,13 @@ class TodoApp {
 
         container.querySelectorAll('.edit-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const rawId = e.target.dataset.id;
+                // 如果点击的是子元素，向上查找包含 data-id 的父元素
+                let target = e.target;
+                while (target && !target.dataset.id) {
+                    target = target.parentElement;
+                }
+                
+                const rawId = target ? target.dataset.id : null;
                 const id = parseInt(rawId);
                 if (isNaN(id) || id <= 0) {
                     console.error('Invalid todo ID:', rawId);
@@ -362,14 +400,20 @@ class TodoApp {
 
         container.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const rawId = e.target.dataset.id;
+                // 如果点击的是子元素，向上查找包含 data-id 的父元素
+                let target = e.target;
+                while (target && !target.dataset.id) {
+                    target = target.parentElement;
+                }
+                
+                const rawId = target ? target.dataset.id : null;
                 const id = parseInt(rawId);
                 if (isNaN(id) || id <= 0) {
                     console.error('Invalid todo ID:', rawId);
                     this.showError('无效的待办事项ID');
                     return;
                 }
-                this.deleteTodo(id);
+                this.deleteTodo(id, target);
             });
         });
     }
