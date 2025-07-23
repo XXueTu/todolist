@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(go mod init:*)",
+      "Bash(go get:*)",
+      "Bash(mkdir:*)",
+      "Bash(go install:*)",
+      "Bash(goctl api go:*)",
+      "Bash(go mod:*)",
+      "Bash(touch:*)",
+      "Bash(go build:*)",
+      "Bash(CGO_ENABLED=1 go build -o todolist .)",
+      "Bash(apt-get:*)",
+      "Bash(apt-get install:*)",
+      "Bash(./todolist)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(true)",
+      "Bash(find:*)"
+    ],
+    "deny": []
+  }
+}

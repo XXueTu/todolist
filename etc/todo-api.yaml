@@ -1,0 +1,6 @@
+Name: todo-api
+Host: 0.0.0.0
+Port: 8080
+Database:
+  Driver: sqlite
+  Source: ./data/todo.db

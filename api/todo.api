@@ -1,0 +1,58 @@
+syntax = "v1"
+
+info (
+	title:   "Todo List API"
+	desc:    "A simple todo list application"
+	author:  "Go-Zero"
+	version: "v1.0"
+)
+
+type Todo {
+	ID          int64  `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Completed   bool   `json:"completed"`
+	CreatedAt   string `json:"created_at"`
+	UpdatedAt   string `json:"updated_at"`
+}
+
+type CreateTodoReq {
+	Title       string `json:"title"`
+	Description string `json:"description,optional"`
+}
+
+type UpdateTodoReq {
+	ID          int64  `path:"id"`
+	Title       string `json:"title,optional"`
+	Description string `json:"description,optional"`
+	Completed   bool   `json:"completed,optional"`
+}
+
+type TodoReq {
+	ID int64 `path:"id"`
+}
+
+type TodoListResp {
+	List []Todo `json:"list"`
+}
+
+service todo-api {
+	@handler GetTodos
+	get /api/todos returns (TodoListResp)
+
+	@handler CreateTodo
+	post /api/todos (CreateTodoReq) returns (Todo)
+
+	@handler GetTodo
+	get /api/todos/:id (TodoReq) returns (Todo)
+
+	@handler UpdateTodo
+	put /api/todos/:id (UpdateTodoReq) returns (Todo)
+
+	@handler DeleteTodo
+	delete /api/todos/:id (TodoReq)
+
+	@handler ServeStatic
+	get /
+}
+
